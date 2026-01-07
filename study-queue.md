@@ -11,6 +11,8 @@ Keep this list updated after each discussion. Capture what to learn, why, and su
 - Trie (Prefix Tree) Basics: Learn structure and insertion/search for prefix problems (Context: Longest Common Prefix).
 - Boyer-Moore Voting Algorithm: Understand the visualization of "canceling out" votes (Context: Majority Element).
 - Cyclic Sort / Negative Marking: Learn the pattern for O(n) time O(1) space range-based array problems (Context: Find Missing/Disappeared/Duplicate numbers).
+- Bucket Sort: Useful for frequency problems where max freq <= N (Context: Top K Frequent).
+- Prefix/Suffix Arrays vs Accumulator: Optimization pattern to reduce space from O(N) to O(1) (Context: Product Except Self).
 
 ## In Progress
 - (add items you are actively studying)

@@ -178,5 +178,35 @@
 		"myComplexity": "Counting Sort: Two passes. First, count r, w, b. Second, overwrite array with 0s then 1s then 2s. Time O(n), Space O(1).",
 		"betterApproach": "Dutch National Flag: One pass. 3 pointers (low, mid, high). If 0, swap(low++, mid++). If 1, mid++. If 2, swap(mid, high--). Time O(n), Space O(1).",
 		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-04",
+		"number": 347,
+		"name": "Top K Frequent Elements",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    vector<int> topKFrequent(vector<int>& nums, int k) {\n        map<int, vector<int>, greater<int>> mp;\n        unordered_map<int, int> um;\n        int len=nums.size();\n        vector<int> ans;\n        for(int i=0; i<len; i++){\n            um[nums[i]]++;\n        }\n        for(auto i:um){\n            mp[i.second].push_back(i.first);\n        }\n        for(auto i:mp){\n            for(int x:i.second){\n                ans.push_back(x);\n                if(!--k) return ans;\n            }\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Count freq in unordered_map. Push to std::map<count, vector<nums>> (sorted by key desc). Iterate map to harvest top k. Time O(N log N) (map inserts), Space O(N).",
+		"betterApproach": "Bucket Sort: Since freq <= N, create array of buckets[count]. Fill buckets. Iterate backwards from N to 1 to find top k. Time O(N), Space O(N). (Alt: Min-Heap size k is O(N log K)).",
+		"betterComplexity": "Time O(N), Space O(N)."
+	},
+	{
+		"date": "2026-01-04",
+		"number": 238,
+		"name": "Product of Array Except Self",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        int len=nums.size(), pl=1, pr=1;\n        vector<int> l(len), r(len), ans(len);\n        for(int i=0; i<len; i++){\n            l[i]=pl;\n            r[len-1-i]=pr;\n            pl*=nums[i];\n            pr*=nums[len-1-i];\n        }\n        for(int i=0; i<len; i++){\n            pl=(i==0)?1:l[i];\n            pr=(i==len-1)?1:r[i];\n            ans[i]=pl*pr;\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Calculate separate Prefix Product array and Suffix Product array. ans[i] = pre[i] * suf[i]. Time O(N), Space O(N) (extra arrays).",
+		"betterApproach": "Optimize Space: Write prefix products directly into ans array. Then iterate backwards with a scalar 'suffix' variable, multiplying into ans[i]. Time O(N), Space O(1) (aux).",
+		"betterComplexity": "Time O(N), Space O(1) (aux)."
+	},
+	{
+		"date": "2026-01-04",
+		"number": 1390,
+		"name": "Four Divisors",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    int divC(int n){\n        int div=0, sum=0;\n        unordered_set<int> s;\n        for(int i=1; i*i<=n; i++){\n            if(n%i==0){\n                s.insert(i);\n                s.insert(n/i);\n            }\n        }\n        if(s.size()==4){\n            for(int i:s){\n                sum+=i;\n            }\n        }\n        else sum=-1;\n        return sum;\n    }\n\n    int sumFourDivisors(vector<int>& nums) {\n        int ans=0;\n        for(int i=0; i<nums.size(); i++){\n            cout<<nums[i]<<\" \"<<divC(nums[i])<<endl;\n            if(divC(nums[i])!=-1) ans+=divC(nums[i]);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Iterate 1 to sqrt(n). If divides, add i and n/i to set. If set size is 4, add to sum. Iterate for all nums. Time O(N*sqrt(val)), Space O(1).",
+		"betterApproach": "Same iteration limit. Count factors directly without Set overhead. If count > 4, break early. Sum if count exactly 4. (Case: p^3 or p*q). Time O(N*sqrt(val)), Space O(1).",
+		"betterComplexity": "Time O(N*sqrt(val)), Space O(1)."
 	}
 ]
