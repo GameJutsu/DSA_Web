@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Solved Entry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="title">
+        <h1>Add solved entry</h1>
+        <p>Prepare a payload to append via script.</p>
+      </div>
+      <div class="actions">
+        <a class="chip" href="index.html">Back to dashboard</a>
+      </div>
+    </header>
+
+    <section class="card fade-in">
+      <form id="entry-form" class="grid" style="gap:12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+        <label class="grid" style="gap:6px;">
+          <span class="small">Date (YYYY-MM-DD)</span>
+          <input name="date" type="date" required />
+        </label>
+        <label class="grid" style="gap:6px; grid-column: 1 / -1;">
+          <span class="small">Problem (e.g., 1929. Concatenation of Array)</span>
+          <input name="problemLine" type="text" placeholder="123. Problem Name" required />
+        </label>
+        <label class="grid" style="gap:6px;">
+          <span class="small">Difficulty</span>
+          <select name="difficulty" required>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </label>
+        <label class="grid" style="gap:6px; grid-column: 1 / -1;">
+          <span class="small">Your C++ solution</span>
+          <textarea name="code" rows="8" placeholder="Paste your code here" required></textarea>
+        </label>
+        <div class="flex" style="justify-content:flex-end; grid-column: 1 / -1;">
+          <button type="submit">Generate payload</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card fade-in" id="payload-card" style="display:none;">
+      <div class="timeline-header">
+        <h3>Payload ready</h3>
+        <span class="small">Copy and share for approval</span>
+      </div>
+      <div class="grid" style="gap:10px;">
+        <div class="flex" style="justify-content:space-between;">
+          <span class="pill" id="hash-pill">hash: --</span>
+          <button id="copy-btn" type="button">Copy JSON</button>
+        </div>
+        <pre class="code-preview" id="payload-output"></pre>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="scripts/add-entry-page.js"></script>
+</body>
+</html>

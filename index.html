@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeetCode 250 Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+</head>
+<body>
+  <a class="fab" href="add-entry.html">Add entry</a>
+  <div class="container">
+    <header class="header">
+      <div class="title">
+        <h1>NeetCode 250 — Darkline</h1>
+        <p>Glide through your list, track streaks, and log wins.</p>
+      </div>
+      <div class="actions">
+        <span class="chip">Live data from nc250.json + data/solved.json</span>
+        <span class="chip" id="mini-pill">Today: -- | 7d: --</span>
+      </div>
+    </header>
+
+    <section class="grid stats-grid" id="stats-grid">
+      <!-- Stats cards injected by JS -->
+    </section>
+
+    <section class="card chart-card fade-in" id="charts">
+      <div>
+        <div class="chart-top">
+          <div>
+            <h3>Monthly solved</h3>
+            <p class="small">Flip through 2026 months.</p>
+          </div>
+          <div class="chart-nav">
+            <button class="nav-btn" id="month-prev" aria-label="Previous month">&#60;</button>
+            <span id="month-label" class="small">--</span>
+            <button class="nav-btn" id="month-next" aria-label="Next month">&#62;</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="daily-chart" height="200"></canvas>
+        </div>
+      </div>
+      <div>
+        <h3>By difficulty</h3>
+        <p class="small">Solved by tier.</p>
+        <div class="canvas-wrap">
+          <canvas id="difficulty-chart" height="200"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="card fade-in">
+      <div class="timeline-header">
+        <h3>2026 submission heatmap</h3>
+        <span class="small">Brightness = problems solved per day</span>
+      </div>
+      <div class="heatmap-wrap">
+        <div id="year-heatmap" class="heatmap-grid"></div>
+      </div>
+    </section>
+
+    <section class="card fade-in">
+      <div class="accordion" id="accordion">
+        <div class="timeline-header">
+          <h3>NeetCode 250 — Accordion</h3>
+          <span class="small">Tap a section to view problems</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card fade-in">
+      <div class="timeline-header">
+        <h3>Timeline</h3>
+        <span class="small">Latest solved entries</span>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </section>
+
+    <section class="card fade-in study-card">
+      <div class="timeline-header">
+        <h3>Study Queue</h3>
+        <span class="small">Track next topics to learn</span>
+      </div>
+      <p class="small">Keep open items, in-progress notes, and takeaways in one place.</p>
+      <a class="link-btn" href="study-queue.md" target="_blank" rel="noreferrer">Open study-queue.md</a>
+    </section>
+  </div>
+
+  <script type="module" src="scripts/main.js"></script>
+</body>
+</html>
