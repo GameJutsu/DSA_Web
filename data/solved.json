@@ -248,5 +248,25 @@
 		"myComplexity": "Calc total absolute sum, count negatives, find min absolute value. If even negatives, return sum (can flip all positive). If odd, subtract 2*min (must leave one negative). Time O(N^2), Space O(1).",
 		"betterApproach": "This is optimal. Key insight: adjacent swaps allow moving negative signs anywhere. Parity of negative count determines if we can eliminate all or must keep one. Time O(N^2), Space O(1).",
 		"betterComplexity": "Time O(N^2), Space O(1)."
+	},
+	{
+		"date": "2026-01-06",
+		"number": 102,
+		"name": "Binary Tree Level Order Traversal",
+		"difficulty": "Medium",
+		"code": "/**\n * Definition for a binary tree node.\n * struct TreeNode {\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) {}\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}\n * };\n */\nclass Solution {\npublic:\n    vector<vector<int>> levelOrder(TreeNode* root) {\n        vector<vector<int>>ans;\n        if(root==NULL)return ans;\n        queue<TreeNode*>q;\n        q.push(root);\n        while(!q.empty()){\n            int s=q.size();\n            vector<int>v;\n            for(int i=0;i<s;i++){\n                TreeNode *node=q.front();\n                q.pop();\n                if(node->left!=NULL)q.push(node->left);\n                if(node->right!=NULL)q.push(node->right);\n                v.push_back(node->val);\n            }\n            ans.push_back(v);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "BFS / Queue: Iterate levels. Get size of current queue (level width), process that many nodes, push children. Add level vector to ans. Time O(N), Space O(N) (max width).",
+		"betterApproach": "DFS (Preorder): Pass 'level' to recursive function. If ans.size() == level, push empty vector. Append val to ans[level]. Same complexity, slightly less code. Time O(N), Space O(H).",
+		"betterComplexity": "Time O(N), Space O(H)."
+	},
+	{
+		"date": "2026-01-06",
+		"number": 1161,
+		"name": "Maximum Level Sum of a Binary Tree",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    int maxLevelSum(TreeNode* root) {\n        vector<int> ans={0,INT_MIN};\n        int lvl=0;\n        if(root==NULL)return ans[0];\n        queue<TreeNode*>q;\n        q.push(root);\n        while(!q.empty()){\n            lvl++;\n            int s=q.size(), sum=0;\n            for(int i=0;i<s;i++){\n                TreeNode *node=q.front();\n                q.pop();\n                if(node->left!=NULL)q.push(node->left);\n                if(node->right!=NULL)q.push(node->right);\n                sum+=(node->val);\n            }\n            if(sum>ans[1]){\n                ans[0]=lvl;\n                ans[1]=sum;\n            }\n        }\n        return ans[0];\n    }\n};",
+		"myComplexity": "BFS Level Order. Maintain current MaxSum and Level. For each level, sum nodes. If sum > MaxSum, update. Return Level. Time O(N), Space O(N) (queue).",
+		"betterApproach": "This is optimal. BFS naturally aggregates levels. DFS would require auxiliary storage for all level sums before comparison. Time O(N), Space O(N).",
+		"betterComplexity": "Time O(N), Space O(N)."
 	}
 ]
