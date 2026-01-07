@@ -1,4 +1,4 @@
-import { loadProblems, loadSolved, buildSolvedLookup, computeStats, difficultyClass } from './data.js';
+import { loadProblems, loadSolved, buildSolvedLookup, computeStats, difficultyClass, ACTIVE_YEAR } from './data.js';
 import { renderDailyChart, renderDifficultyPie } from './charts.js';
 
 document.addEventListener('DOMContentLoaded', init);
@@ -147,6 +147,7 @@ function setupMonthlyChart(months, tooltipEl) {
   if (!canvas || !monthLabel || !prevBtn || !nextBtn || !months?.length) return;
 
   const today = new Date();
+  if (today.getFullYear() < ACTIVE_YEAR) today.setFullYear(ACTIVE_YEAR);
   const currentKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
   let idx = months.findIndex(m => m.key === currentKey);
   if (idx === -1) idx = months.length - 1;

@@ -268,5 +268,15 @@
 		"myComplexity": "BFS Level Order. Maintain current MaxSum and Level. For each level, sum nodes. If sum > MaxSum, update. Return Level. Time O(N), Space O(N) (queue).",
 		"betterApproach": "This is optimal. BFS naturally aggregates levels. DFS would require auxiliary storage for all level sums before comparison. Time O(N), Space O(N).",
 		"betterComplexity": "Time O(N), Space O(N)."
+	},
+	{
+		"date": "2026-01-07",
+		"number": 344,
+		"name": "Reverse String",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    void reverseString(vector<char>& s) {\n        int len=s.size();\n        for(int i=0; i<len/2; i++){\n            swap(s[i], s[len-1-i]);\n        }\n    }\n};",
+		"myComplexity": "Iterate from 0 to len/2. Swap s[i] with s[len-1-i]. Time O(n), Space O(1).",
+		"betterApproach": "This is optimal. In C++ one would often use std::reverse(s.begin(), s.end()). Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
 	}
 ]

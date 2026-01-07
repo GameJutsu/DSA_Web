@@ -79,6 +79,7 @@ export function computeStats(problems, solved) {
     diffTotals,
     diffSolved,
     dailyCounts,
+    streak,
     monthlyCounts,
     yearHeatmap,
     projections,
@@ -95,9 +96,11 @@ export function computeDailyCounts(solved) {
   });
 
   const today = new Date();
+  if (today.getFullYear() < ACTIVE_YEAR) today.setFullYear(ACTIVE_YEAR);
+
   const dailyCounts = [];
   for (let i = 29; i >= 0; i--) {
-    const d = new Date();
+    const d = new Date(today);
     d.setDate(today.getDate() - i);
     const key = formatDateLocal(d);
     dailyCounts.push({ date: key, count: counts.get(key) || 0 });
@@ -153,6 +156,8 @@ export function computeYearHeatmap(solved, year = ACTIVE_YEAR) {
 function computeProjections({ solvedCountNeet, solvedCountAll }, year = ACTIVE_YEAR) {
   const start = new Date(year, 0, 1);
   const today = new Date();
+  if (today.getFullYear() < year) today.setFullYear(year);
+  
   const dayMs = 24 * 60 * 60 * 1000;
   const elapsed = Math.max(1, Math.floor((today - start) / dayMs) + 1);
 
@@ -184,17 +189,54 @@ function addDays(date, days) {
 }
 
 function computeStreak(counts) {
+  // 1. Collect all dates with activity
+  const dates = [];
+  for (const dateStr of counts.keys()) {
+    if (counts.get(dateStr) > 0) {
+      dates.push(dateStr);
+    }
+  }
+
+  if (dates.length === 0) return 0;
+
+  // 2. Sort dates descending
+  dates.sort((a, b) => b.localeCompare(a));
+
+  // 3. Current Reference Date
+  const today = new Date();
+  if (today.getFullYear() < ACTIVE_YEAR) today.setFullYear(ACTIVE_YEAR);
+  const todayStr = formatDateLocal(today);
+  
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = formatDateLocal(yesterday);
+
+  const latestStr = dates[0];
+  
+  // If the latest submission is neither Today nor Yesterday, the streak is broken (0).
+  if (latestStr !== todayStr && latestStr !== yesterdayStr) {
+    return 0;
+  }
+
+  // 4. Count consecutive days backwards from the latest submission
   let streak = 0;
-  let d = new Date();
+  let currentKey = latestStr;
+
+  // Manual date parsing to ensure no timezone offset issues
+  const [y, m, dNum] = currentKey.split('-').map(Number);
+  let d = new Date(y, m - 1, dNum);
+
   for (;;) {
     const key = formatDateLocal(d);
-    if (counts.get(key)) {
-      streak += 1;
+    
+    if (counts.has(key) && counts.get(key) > 0) {
+      streak++;
       d.setDate(d.getDate() - 1);
     } else {
       break;
     }
   }
+
   return streak;
 }
 
