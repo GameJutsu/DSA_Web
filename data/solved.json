@@ -208,5 +208,45 @@
 		"myComplexity": "Iterate 1 to sqrt(n). If divides, add i and n/i to set. If set size is 4, add to sum. Iterate for all nums. Time O(N*sqrt(val)), Space O(1).",
 		"betterApproach": "Same iteration limit. Count factors directly without Set overhead. If count > 4, break early. Sum if count exactly 4. (Case: p^3 or p*q). Time O(N*sqrt(val)), Space O(1).",
 		"betterComplexity": "Time O(N*sqrt(val)), Space O(1)."
+	},
+	{
+		"date": "2026-01-05",
+		"number": 36,
+		"name": "Valid Sudoku",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    bool isValidSudoku(vector<vector<char>>& board) {\n        // Row wise check\n        for(int i=0; i<9; i++)\n        {\n            unordered_map<char,int> um;\n            for(int j=0; j<9; j++)\n            {\n                if(board[i][j]!='.' && ++um[board[i][j]]>1) return false;\n            }\n        }\n        // Column wise check\n        for(int j=0; j<9; j++)\n        {\n            unordered_map<char,int> um;\n            for(int i=0; i<9; i++)\n            {\n                if(board[i][j]!='.' && ++um[board[i][j]]>1) return false;\n            }\n        }\n        // Grid wise check\n        for(int g=0; g<9; g++)\n        {\n            unordered_map<char,int> um;\n            for(int i=3*(g/3); i<3*(g/3)+3; i++)\n            {\n                for(int j=(g%3)*3; j<(g%3)*3+3; j++)\n                {\n                    if(board[i][j]!='.' && ++um[board[i][j]]>1) return false;\n                }\n            }\n        }\n        return true;\n    }\n};",
+		"myComplexity": "3 Passes: Check rows, then cols, then 3x3 grids. Use map in each iteration to detect duplicates. Time O(1) (fixed 9x9), Space O(1).",
+		"betterApproach": "Single Pass: Iterate i,j once. Maintain bool arrays for row[9][9], col[9][9], and box[9][9]. Calculate box index k. Check and set flags. Slightly faster logic. Time O(1), Space O(1).",
+		"betterComplexity": "Time O(1), Space O(1)."
+	},
+	{
+		"date": "2026-01-05",
+		"number": 229,
+		"name": "Majority Element II",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    vector<int> majorityElement(vector<int>& nums) {\n        unordered_map<int,int> um;\n        vector<int> ans;\n        for(int n:nums) um[n]++;\n        for(auto i:um){\n            if(i.second>nums.size()/3) ans.push_back(i.first);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Count frequencies with map. Iterate map, if count > n/3, add to result. Time O(N), Space O(N).",
+		"betterApproach": "Boyer-Moore Voting (General): Max 2 candidates for >n/3. Maintain cand1, cand2, cnt1, cnt2. Pass 1: find candidates. Pass 2: verify counts. Time O(N), Space O(1).",
+		"betterComplexity": "Time O(N), Space O(1)."
+	},
+	{
+		"date": "2026-01-05",
+		"number": 1411,
+		"name": "Number of Ways to Paint N × 3 Grid",
+		"difficulty": "Hard",
+		"code": "class Solution {\npublic:\n    int numOfWays(int n) {\n        if(n==1) return 12;\n        long long sym=6, nonSym=6, ans, mod=1e9+7;\n        while(--n){\n            long long s=sym, n=nonSym;\n            sym=(s*3)%mod+(n*2)%mod;\n            nonSym=(s*2)%mod+(n*2)%mod;\n            ans=(sym+nonSym)%mod;\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "DP Recurrence. Two states: Symmetric (ABA) and Non-Sym (ABC). Sym generates 3 Sym + 2 Non. Non generates 2 Sym + 2 Non. Iterate n times. Time O(n), Space O(1).",
+		"betterApproach": "Matrix Exponentiation: Since recurrence is linear relation [3 2; 2 2], use matrix power to calculate nth state in Log time. Time O(log n), Space O(1).",
+		"betterComplexity": "Time O(log n), Space O(1)."
+	},
+	{
+		"date": "2026-01-05",
+		"number": 1975,
+		"name": "Maximum Matrix Sum",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    long long maxMatrixSum(vector<vector<int>>& matrix) {\n        long long n=matrix.size(), sum=0, neg=0;\n        int low=INT_MAX;\n        for(int i=0; i<n; i++){\n            for(int j=0; j<n; j++){\n                neg+=(matrix[i][j]<0)?1:0;\n                sum+=abs(matrix[i][j]);\n                low=min(low, abs(matrix[i][j]));\n            }\n        }\n        return (neg%2==0)?sum:sum-2*low;\n    }\n};",
+		"myComplexity": "Calc total absolute sum, count negatives, find min absolute value. If even negatives, return sum (can flip all positive). If odd, subtract 2*min (must leave one negative). Time O(N^2), Space O(1).",
+		"betterApproach": "This is optimal. Key insight: adjacent swaps allow moving negative signs anywhere. Parity of negative count determines if we can eliminate all or must keep one. Time O(N^2), Space O(1).",
+		"betterComplexity": "Time O(N^2), Space O(1)."
 	}
 ]

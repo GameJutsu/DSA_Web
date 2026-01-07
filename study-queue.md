@@ -13,6 +13,8 @@ Keep this list updated after each discussion. Capture what to learn, why, and su
 - Cyclic Sort / Negative Marking: Learn the pattern for O(n) time O(1) space range-based array problems (Context: Find Missing/Disappeared/Duplicate numbers).
 - Bucket Sort: Useful for frequency problems where max freq <= N (Context: Top K Frequent).
 - Prefix/Suffix Arrays vs Accumulator: Optimization pattern to reduce space from O(N) to O(1) (Context: Product Except Self).
+- Linear Recurrence & Matrix Exponentiation: Solving DP in O(log n) when transitions are linear (Context: Paint N x 3 Grid).
+- Greedy with Invariants: Parity arguments (even/odd negatives) determining global state (Context: Max Matrix Sum).
 
 ## In Progress
 - (add items you are actively studying)
