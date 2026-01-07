@@ -68,5 +68,115 @@
 		"myComplexity": "Init ans=strs[0]. Loop others, compare with ans char-by-char, rebuilding newAns. Update ans. Time O(S) (sum of chars), Space O(S) (temp strings).",
 		"betterApproach": "Sort the strings. Compare only the first and last string (smallest & largest lexicographically). The common prefix of these two is the answer for all. Time O(N*L*logN), Space O(1).",
 		"betterComplexity": "Time O(N*L*logN), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 49,
+		"name": "Group Anagrams",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    vector<vector<string>> groupAnagrams(vector<string>& strs) {\n        map<vector<int>,vector<string>> mp;\n        for(string s:strs){\n            vector<int> curr(26,0);\n            for(char c:s){\n                curr[c-'a']++;\n            }\n            mp[curr].push_back(s);\n        }\n        vector<vector<string>> ans;\n        for(auto i:mp){\n            ans.push_back(i.second);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Use std::map with vector<int> keys (freq counts). Calculate count per string, group in map. Return values. Time O(N*K log N), Space O(N*K).",
+		"betterApproach": "Use unordered_map for O(1) avg access. Key can be a generated string (e.g. '1#0#2...') or custom hash for vector<int>. Reduces time to O(N*K).",
+		"betterComplexity": "Time O(N*K), Space O(N*K)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 1470,
+		"name": "Shuffle the Array",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> shuffle(vector<int>& nums, int n) {\n        int i=0, j=n, curr=0;\n        vector<int> ans(2*n);\n        while(i<n && j<2*n){\n            ans[curr++]=nums[i++];\n            ans[curr++]=nums[j++];\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Two pointers: i=0, j=n. Create ans vector size 2n. Loop, placing nums[i] then nums[j] into ans. Time O(n), Space O(n).",
+		"betterApproach": "For O(1) space (if constraints allow), pack two nums into one integer (e.g., using bit shifting: val = x + (y << 10)) in-place, then unpack in a second pass. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(N), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 485,
+		"name": "Max Consecutive Ones",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    int findMaxConsecutiveOnes(vector<int>& nums) {\n        int len=nums.size(), i=0, ans=0, curr;\n        while(i<len){\n            curr=0;\n            while(i<len && nums[i]==1){\n                curr++;\n                i++;\n            }\n            while(i<len && nums[i]==0){\n                i++;\n            }\n            ans=max(ans, curr);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Iterate with index i. Inner loop: count 1s to curr. Update max. Inner loop: skip 0s. Time O(n), Space O(1).",
+		"betterApproach": "Single pass. If 1: curr++, max = max(ans, curr). If 0: curr = 0. Simpler logic but same complexity. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 645,
+		"name": "Set Mismatch",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> findErrorNums(vector<int>& nums) {\n        int len=nums.size(), rep, miss;\n        vector<int> cnt(len+1, 0);\n        for(int n:nums){\n            cnt[n]++;\n        }\n        for(int i=1; i<len+1; i++){\n            if(cnt[i]==2) rep=i;\n            if(cnt[i]==0) miss=i;\n        }\n        return {rep, miss};\n    }\n};",
+		"myComplexity": "Use freq array size n+1. Count occurrences. Index with count 2 is Rep, count 0 is Miss. Time O(n), Space O(n).",
+		"betterApproach": "Math approach: Calc diff of Sums (S - A = miss - dup) and diff of Square Sums (S2 - A2 = miss^2 - dup^2). Solve system of eqns. Or use Array Marking (negating indices). Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 1365,
+		"name": "How Many Numbers Are Smaller Than the Current Number",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> smallerNumbersThanCurrent(vector<int>& nums) {\n        int len=nums.size(), curr;\n        vector<int> ans(len);\n        for(int i=0; i<len; i++){\n            curr=0;\n            for(int j=0; j<len; j++){\n                if(nums[j]<nums[i]) curr++;\n            }\n            ans[i]=curr;\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Brute force: Nested loops. For each element i, counting how many j exist where nums[j] < nums[i]. Time O(n^2), Space O(n).",
+		"betterApproach": "Buckets/Prefix Sum (since values <=100): Count freqs in array size 101. Compute prefix sums (count[i] += count[i-1]). count[val-1] is the result. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 448,
+		"name": "Find All Numbers Disappeared in an Array",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> findDisappearedNumbers(vector<int>& nums) {\n        int len=nums.size();\n        vector<int> cnt(len+1, 0), ans;\n        for(int n:nums){\n            cnt[n]++;\n        }\n        for(int i=1; i<=len; i++){\n            if(cnt[i]==0) ans.push_back(i);\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Create freq vector size len+1. Count occurrences. Indices 1..len with 0 count are missing, add to ans. Time O(n), Space O(n).",
+		"betterApproach": "In-place marking: For each val, negate nums[abs(val)-1]. Second pass: if nums[i] > 0, then i+1 is missing. No extra space. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 27,
+		"name": "Remove Element",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    int removeElement(vector<int>& nums, int val) {\n        int i=0, j=0, len=nums.size(), ans=0;\n        while(i<len && j<len){\n            while(j<len && nums[j]==val){\n                j++;\n                ans++;\n            }\n            if(i<len && j<len) nums[i++]=nums[j++];\n        }\n        return len-ans;\n    }\n};",
+		"myComplexity": "Two pointers. Pointer j scans and skips 'val'. Pointer i overwrites valid numbers. Count removals. Time O(n), Space O(1).",
+		"betterApproach": "Standard approach: Loop j through array. If nums[j] != val, assign nums[i] = nums[j] and inc i. Return i. Simpler logic, same complexity. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 169,
+		"name": "Majority Element",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    int majorityElement(vector<int>& nums) {\n        int len=nums.size();\n        unordered_map<int,int> um;\n        for(int n:nums){\n            if(++um[n] > len/2) return n;\n        }\n        return -1;\n    }\n};",
+		"myComplexity": "Use map to count freqs. If count > n/2, return element. Time O(n), Space O(n).",
+		"betterApproach": "Boyer-Moore Voting Algorithm: Maintain candidate and count. If count=0, new candidate. If match, count++, else count--. Final candidate is majority. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 705,
+		"name": "Design HashSet",
+		"difficulty": "Easy",
+		"code": "class MyHashSet {\npublic:\n    vector<bool> v = vector<bool>(1e6+1, false);\n    MyHashSet() {\n    }\n    \n    void add(int key) {\n        v[key]=true;\n    }\n    \n    void remove(int key) {\n        v[key]=false;\n    }\n    \n    bool contains(int key) {\n        return v[key];\n    }\n};",
+		"myComplexity": "Direct Mapping: Use bool vector size 1e6+1. Key is index. O(1) ops. Space O(1) (fixed max range).",
+		"betterApproach": "Chaining (Generic): Vector of Linked Lists (Buckets). Hash key to bucket index. Handle collisions by searching list. Better for sparse/infinite ranges. Time O(1) avg, Space O(K).",
+		"betterComplexity": "Time O(1) avg, Space O(K)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 706,
+		"name": "Design HashMap",
+		"difficulty": "Easy",
+		"code": "class MyHashMap {\npublic:\n    vector<int> v = vector<int> (1e6+1, -1);\n    MyHashMap() {\n        \n    }\n    \n    void put(int key, int value) {\n        v[key]=value;\n    }\n    \n    int get(int key) {\n        return v[key];\n    }\n    \n    void remove(int key) {\n        v[key]=-1;\n    }\n};",
+		"myComplexity": "Direct Mapping: Use int vector size 1e6+1, init to -1. Key is index. O(1) ops. Space O(1) (fixed max range).",
+		"betterApproach": "Chaining: Array of Lists (key-value pairs). Hash key to bucket. More memory efficient for sparse keys. Time O(1) avg, Space O(N).",
+		"betterComplexity": "Time O(1) avg, Space O(N)."
+	},
+	{
+		"date": "2026-01-03",
+		"number": 75,
+		"name": "Sort Colors",
+		"difficulty": "Medium",
+		"code": "class Solution {\npublic:\n    void sortColors(vector<int>& nums) {\n        int r=0, w=0, b=0, i=0;\n        for(int n:nums){\n            if(n==0) r++;\n            else if(n==1) w++;\n            else b++;\n        }\n        while(r--) nums[i++]=0;\n        while(w--) nums[i++]=1;\n        while(b--) nums[i++]=2;\n    }\n};",
+		"myComplexity": "Counting Sort: Two passes. First, count r, w, b. Second, overwrite array with 0s then 1s then 2s. Time O(n), Space O(1).",
+		"betterApproach": "Dutch National Flag: One pass. 3 pointers (low, mid, high). If 0, swap(low++, mid++). If 1, mid++. If 2, swap(mid, high--). Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
 	}
 ]

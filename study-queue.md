@@ -8,7 +8,9 @@ Keep this list updated after each discussion. Capture what to learn, why, and su
 - Keep bullets concise but specific (topic + angle + resource if known).
 
 ## Open
-- (add new items here)
+- Trie (Prefix Tree) Basics: Learn structure and insertion/search for prefix problems (Context: Longest Common Prefix).
+- Boyer-Moore Voting Algorithm: Understand the visualization of "canceling out" votes (Context: Majority Element).
+- Cyclic Sort / Negative Marking: Learn the pattern for O(n) time O(1) space range-based array problems (Context: Find Missing/Disappeared/Duplicate numbers).
 
 ## In Progress
 - (add items you are actively studying)
