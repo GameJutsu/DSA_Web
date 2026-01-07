@@ -1,0 +1,22 @@
+[
+	{
+		"date": "2026-01-01",
+		"number": 1929,
+		"name": "Concatenation of Array",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> getConcatenation(vector<int>& nums) {\n        int len=nums.size();\n        vector<int> ans(len*2);\n        for(int i=0; i<len; i++){\n            ans[i]=nums[i];\n            ans[len+i]=nums[i];\n        }\n        return ans;\n    }\n};",
+		"myComplexity": "Single pass, time O(n), extra space O(n) for the duplicated array (output-sized).",
+		"betterApproach": "This is already optimal; the task requires materializing the doubled array, so no asymptotically better approach exists.",
+		"betterComplexity": "Time O(n), space O(n) due to required 2n output size."
+	},
+	{
+		"date": "2026-01-01",
+		"number": 66,
+		"name": "Plus One",
+		"difficulty": "Easy",
+		"code": "class Solution {\npublic:\n    vector<int> plusOne(vector<int>& digits) {\n        int len=digits.size();\n        for(int i=len-1; i>=0; i--){\n            if(digits[i]!=9){\n                digits[i]+=1;\n                return digits;\n            }\n            else\n            {\n                if(i==0){\n                    digits[i]=1;\n                    digits.push_back(0);\n                }\n                else digits[i]=0;\n            }\n        }\n        return digits;\n    }\n};",
+		"myComplexity": "Iterate backwards. If digit != 9, inc & return. If 9, set to 0. If i==0 is reached (all 9s thus far), set first to 1 and append 0. Time O(n), Space O(1).",
+		"betterApproach": "Logic is identical, but cleaner: loop backwards, if <9 inc & return, else set to 0. If loop finishes (all 9s), handle resize/carry outside loop. Time O(n), Space O(1).",
+		"betterComplexity": "Time O(n), Space O(1)."
+	}
+]
