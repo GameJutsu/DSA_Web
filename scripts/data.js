@@ -65,7 +65,7 @@ export function computeStats(problems, solved) {
   const diffSolved = { Easy: 0, Medium: 0, Hard: 0 };
   annotatedYear.forEach(entry => { diffSolved[entry.difficulty] = (diffSolved[entry.difficulty] || 0) + 1; });
 
-  const { dailyCounts, streak } = computeDailyCounts(annotatedYear);
+  const { dailyCounts, streak, activeDays } = computeDailyCounts(annotatedYear);
   const monthlyCounts = computeMonthlyCounts(annotatedYear, ACTIVE_YEAR);
   const yearHeatmap = computeYearHeatmap(annotatedYear, ACTIVE_YEAR);
   const projections = computeProjections({ solvedCountNeet, solvedCountAll }, ACTIVE_YEAR);
@@ -80,6 +80,7 @@ export function computeStats(problems, solved) {
     diffSolved,
     dailyCounts,
     streak,
+    activeDays,
     monthlyCounts,
     yearHeatmap,
     projections,
@@ -107,7 +108,8 @@ export function computeDailyCounts(solved) {
   }
 
   const streak = computeStreak(counts);
-  return { dailyCounts, streak };
+  const activeDays = counts.size; 
+  return { dailyCounts, streak, activeDays };
 }
 
 export function computeMonthlyCounts(solved, year = ACTIVE_YEAR) {

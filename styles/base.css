@@ -48,7 +48,7 @@ select:focus,
 textarea:focus {
     border-color: #7cf2d4;
     outline: none;
-    transform: translateY(-1px);
+    /* Removed transform */
 }
 
 button {
@@ -88,13 +88,12 @@ h1, h2, h3 {
     padding: 16px;
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(6px);
-    transition: border 180ms ease, transform 180ms ease, box-shadow 200ms ease;
+    transition: border 180ms ease;
 }
 
 .card:hover {
     border-color: #1b3650;
-    transform: translateY(-2px);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+    /* Removed transform and box-shadow */
 }
 
 .badge {
