@@ -1,17 +1,31 @@
-/* Base resets and typography */
+/* =========================================
+   BASE.CSS
+   Global Resets, Typography, Variables, and Element Defaults.
+   ========================================= */
+
+/* --- Resets & Box Sizing --- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* --- Typography & Root Variables --- */
 :root {
-    font-family: 'JetBrains Mono', 'Fira Code', Consolas, Menlo, monospace;
+    --font-primary: 'JetBrains Mono', 'Fira Code', Consolas, Menlo, monospace;
+    --bg-dark: #040810;
+    --bg-grad-start: #0f1b2d;
+    --text-primary: #e8f0ff;
+    --brand-success: #0dd28a;
+    --brand-accent: #7cf2d4;
+    --brand-gradient: linear-gradient(120deg, #0dd28a, #0e7dd8);
+    --border-color: #1f2d44;
 }
 
 body {
-    background: radial-gradient(circle at 20% 20%, #0f1b2d, #040810 60%);
-    color: #e8f0ff;
+    font-family: var(--font-primary);
+    background: radial-gradient(circle at 20% 20%, var(--bg-grad-start), var(--bg-dark) 60%);
+    color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
     padding: 24px;
@@ -20,15 +34,21 @@ body {
     gap: 24px;
 }
 
+h1, h2, h3 {
+    letter-spacing: 0.5px;
+}
+
 a {
-    color: #7cf2d4;
+    color: var(--brand-accent);
     text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 a:hover {
     color: #9df9e3;
 }
 
+/* --- Element Defaults (Inputs, Buttons) --- */
 button,
 input,
 select,
@@ -36,24 +56,23 @@ textarea {
     font: inherit;
     color: inherit;
     background: #0b1320;
-    border: 1px solid #1f2d44;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 10px 12px;
-    transition: border 160ms ease, transform 160ms ease, background 200ms ease;
+    transition: border 160ms ease, background 200ms ease;
 }
 
 button:hover,
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #7cf2d4;
+    border-color: var(--brand-accent);
     outline: none;
-    /* Removed transform */
 }
 
 button {
     cursor: pointer;
-    background: linear-gradient(120deg, #0dd28a, #0e7dd8);
+    background: var(--brand-gradient);
     border: none;
     color: #03111a;
     font-weight: 700;
@@ -61,13 +80,10 @@ button {
 }
 
 button:active {
-    transform: translateY(0);
+    transform: translateY(1px);
 }
 
-h1, h2, h3 {
-    letter-spacing: 0.5px;
-}
-
+/* --- Utility Classes --- */
 .container {
     width: min(1200px, 100%);
     margin: 0 auto;
@@ -81,75 +97,30 @@ h1, h2, h3 {
     gap: 16px;
 }
 
-.card {
-    background: rgba(10, 18, 32, 0.9);
-    border: 1px solid #142031;
-    border-radius: 14px;
-    padding: 16px;
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(6px);
-    transition: border 180ms ease;
-}
-
-.card:hover {
-    border-color: #1b3650;
-    /* Removed transform and box-shadow */
-}
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-}
-
-.badge.easy { background: rgba(38, 181, 133, 0.16); color: #73fac8; }
-.badge.medium { background: rgba(255, 193, 93, 0.14); color: #ffdd99; }
-.badge.hard { background: rgba(255, 109, 120, 0.16); color: #ff9bb0; }
-
-.accent {
-    color: #7cf2d4;
-}
-
 .flex {
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-.timeline-item {
-    border-left: 2px solid #123149;
-    padding-left: 12px;
-    margin-left: 6px;
-    position: relative;
+.center-text {
+    text-align: center;
 }
 
-.timeline-item::before {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: linear-gradient(120deg, #0dd28a, #0e7dd8);
-    left: -7px;
-    top: 4px;
-    box-shadow: 0 0 12px rgba(124, 242, 212, 0.55);
+.accent {
+    color: var(--brand-accent);
 }
 
-.chip {
-    border: 1px solid #1f2d44;
-    border-radius: 12px;
-    padding: 6px 10px;
-    background: rgba(9, 18, 30, 0.8);
+.small {
+    font-size: 12px;
+    color: #8da4c0;
 }
 
-.footer-space { height: 40px; }
+.footer-space { 
+    height: 40px; 
+}
 
+/* --- Animations --- */
 @keyframes fadeInUp {
     0% { opacity: 0; transform: translateY(12px); }
     100% { opacity: 1; transform: translateY(0); }

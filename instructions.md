@@ -1,11 +1,61 @@
-# Problem Addition Instructions
+# AI Agent Instructions & Architecture
 
-When you say "Add this problem" or "Add this problem as mentioned in the instructions.md", follow this exact flow:
+These instructions guide the AI (GitHub Copilot) in maintaining and extending the High-Retention DSA Tracker.
 
-1) Read the provided code snippet and describe the current solution in plain English. Keep it compact but thorough—mention all important steps, conditions, data structures, and edge-handling. Do not leave out key logic.
-2) Provide a better or more popular approach in plain English at the same verbosity level, also compact but thorough. Explain the algorithm and any critical details (choices, complexity, edge cases).
-3) Identify any new algorithms or patterns encountered that should be added to `study-queue.md`.
-4) Show these descriptions to you for confirmation. Do not modify repo files yet.
-5) After you approve, add the entry to the repository (update `data/solved.json`) and update `study-queue.md` if applicable.
+## 1. Core Philosophy
+- **Data Integrity First**: Never modify `data/solved.json` with regex or sloppy edits. Always treat it as a database.
+- **Strict Typing**: All new data must conform to `data/schema.json`.
+- **Spaced Repetition**: We are building a learning system, not just a logger. Prioritize features that aid memory retention (SRS).
 
-Always ensure the explanations are complete, clear, and exhaustive while staying concise.
+## 2. Project Architecture
+
+### Data Layer
+- **Source of Truth**: `data/solved.json`.
+- **Schema**: `data/schema.json` defines all allowed fields.
+  - `review`: Object containing SRS state (`easeFactor`, `interval`, `nextReviewDate`, `repetitions`).
+  - `myApproach` / `myComplexity`: Auto-generated drafts; optional in schema but should be populated by the AI before commit.
+- **Validation**: All writes must pass through `scripts/commit-entry.js` or be strictly validated against the schema before file creation.
+
+### Style System (CSS)
+- **Modular Approach**:
+  - `base.css`: Variables, resets, typography.
+  - `layout.css`: Page structure, grids, containers.
+  - `components.css`: Reusable UI elements (cards, buttons, chips).
+- **Guidelines**:
+  - Use CSS Variables (`--brand-accent`, etc.) defined in `base.css`.
+  - Avoid inline styles where possible.
+  - No new CSS files without explicit architectural reason.
+
+### JavaScript
+- **Vanilla ES Modules**: No bundlers (Webpack/Vite) to keep it simple and editable.
+- **Roles**:
+  - `scripts/data.js`: Pure functions for fetching and reshaping data.
+  - `scripts/main.js`: DOM manipulation and rendering.
+  - `scripts/commit-entry.js`: Node.js backend logic.
+
+## 3. Operations Manual
+
+### Adding a Feature
+1. **Check Schema**: Does the new feature require data changes? Update `schema.json` first.
+2. **Update Types**: Ensure `scripts/data.js` JSDoc types match.
+3. **Implement UI**: Add to `index.html` or new page.
+
+### Modifying Data
+- **Batch Updates**: If the user needs to refactor old data (e.g., adding a new field), creating a migration script (`scripts/migrate-vX.js`) is preferred over manual editing.
+
+### Generating Notes for New Entries
+- Collect only: `date`, `number`/`name` (from `problemLine`), `difficulty`, and `code` from the user.
+- The AI must generate `myApproach`, `myComplexity`, and optional `better*` fields before payload commit; use safe placeholders if high-confidence generation is not possible.
+
+## 4. Spaced Repetition (SRS)
+- Algorithm: SuperMemo-2 (SM-2).
+- **New Entry**: Starts with `interval: 0` (Due immediately or tomorrow).
+- **Review**: User rates difficulty (Again, Hard, Good, Easy).
+- **Update**:
+  - New Interval = Old Interval * Ease Factor.
+  - Ease Factor update logic is standard SM-2.
+
+## 5. User Interaction Guidelines
+- When the user asks to "Add this problem", **do not** crudely append to JSON.
+- Guide them to the **HTML Form** (`add-entry.html`) OR help them construct the JSON payload to run with the commit script.
+- If editing code, always maintain the file headers and comments.

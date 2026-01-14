@@ -20,6 +20,17 @@ function parseProblemLine(line) {
   };
 }
 
+function generateAutoNotes({ problemName, difficulty, code }) {
+  const snippet = (code || '').split('\n').slice(0, 6).join(' ').trim();
+  const safeName = problemName || 'the problem';
+  return {
+    myApproach: `Auto-generated draft: Solved ${safeName} in C++ using a standard approach suitable for ${difficulty || 'Unknown'} difficulty. Review and adjust if needed. Snippet: ${snippet}`,
+    myComplexity: 'Auto-generated draft: Time O(?), Space O(?) — refine after review.',
+    betterApproach: 'Auto-generated draft: Consider alternative optimizations if applicable.',
+    betterComplexity: ''
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('entry-form');
   const output = document.getElementById('payload-output');
@@ -27,36 +38,79 @@ document.addEventListener('DOMContentLoaded', () => {
   const hashPill = document.getElementById('hash-pill');
   const copyBtn = document.getElementById('copy-btn');
 
+  // Pre-fill date with today
+  const dateInput = form.querySelector('[name="date"]');
+  if (dateInput) {
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${y}-${m}-${d}`;
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
     const parsed = parseProblemLine(data.problemLine || '');
+
     if (!Number.isFinite(parsed.number)) {
       alert('Please include the problem number (e.g., "1929. Concatenation of Array").');
       return;
     }
+
+    const autoNotes = generateAutoNotes({
+      problemName: parsed.name,
+      difficulty: data.difficulty,
+      code: data.code,
+    });
+
     const payload = {
       date: data.date,
       number: parsed.number,
       name: parsed.name,
       difficulty: data.difficulty,
+      link: `https://leetcode.com/problems/${parsed.name.toLowerCase().replace(/\s+/g, '-')}/`,
+      solvedInPython: data.solvedInPython === 'true',
       code: data.code.trim(),
-      myComplexity: '',
-      betterApproach: '',
-      betterComplexity: ''
+      myApproach: autoNotes.myApproach,
+      myComplexity: autoNotes.myComplexity,
+      betterApproach: autoNotes.betterApproach,
+      betterComplexity: autoNotes.betterComplexity,
+      // Initialize SRS Data (Spaced Repetition)
+      review: {
+        nextReviewDate: data.date, // Due immediately/today
+        interval: 0,
+        easeFactor: 2.50,
+        repetitions: 0
+      }
     };
+
+    // Filter out empty optional fields to keep JSON clean
+    if (!payload.betterApproach) delete payload.betterApproach;
+    if (!payload.betterComplexity) delete payload.betterComplexity;
+
     const json = JSON.stringify(payload, null, 2);
     const hash = hashCode(json + data.code);
+    
     hashPill.textContent = `hash: ${hash}`;
     output.textContent = json;
     card.style.display = 'block';
+    
+    // Auto scroll to result
+    card.scrollIntoView({ behavior: 'smooth' });
   });
 
   copyBtn.addEventListener('click', async () => {
     const text = output.textContent;
     if (!text) return;
-    await navigator.clipboard.writeText(text);
-    copyBtn.textContent = 'Copied';
-    setTimeout(() => (copyBtn.textContent = 'Copy JSON'), 1200);
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => (copyBtn.textContent = 'Copy JSON'), 1200);
+    } catch (err) {
+      console.error('Failed to copy', err);
+      alert('Clipboard access failed. Please select and copy manually.');
+    }
   });
 });
+

@@ -3,37 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tracker for NeetCode 250 progress with Spaced Repetition System." />
   <title>NeetCode 250 Tracker</title>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
   <link rel="stylesheet" href="styles/base.css" />
+  <link rel="stylesheet" href="styles/components.css" />
   <link rel="stylesheet" href="styles/layout.css" />
 </head>
 <body>
-  <a class="fab" href="add-entry.html">Add entry</a>
+  
+  <!-- Floating Action Button: Entry Creation -->
+  <a class="fab" href="add-entry.html" aria-label="Add new solved problem">Add entry</a>
+
   <div class="container">
+    
+    <!-- Header Section -->
     <header class="header">
       <div class="title">
         <h1>NeetCode 250 — Darkline</h1>
         <p>Glide through your list, track streaks, and log wins.</p>
       </div>
       <div class="actions">
-        <span class="chip">Live data from nc250.json + data/solved.json</span>
+        <!-- Live Data Indicator -->
+        <span class="chip">Live data from data/solved.json</span>
+        <!-- Mini Stats Pill (Today/7d) -->
         <span class="chip" id="mini-pill">Today: -- | 7d: --</span>
+        <!-- NEW: Due for Review Pill -->
+        <a class="chip accent" href="review.html" id="review-pill" style="display:none;">Review: 0 due</a>
       </div>
     </header>
 
+    <!-- Statistics Grid -->
     <section class="grid stats-grid" id="stats-grid">
-      <!-- Stats cards injected by JS -->
+      <!-- Cards injected by scripts/main.js renderStats() -->
+      <!-- 1. Total Solved -->
+      <!-- 2. NeetCode Progress -->
+      <!-- 3. Streak -->
+      <!-- 4. NeetCode Projection -->
+      <!-- 5. Total Projection -->
     </section>
 
+    <!-- Charts Section -->
     <section class="card chart-card fade-in" id="charts">
       <div>
         <div class="chart-top">
+          <!-- Calendar / Activity Chart -->
           <div>
-            <h3>Monthly solved</h3>
-            <p class="small">Flip through 2026 months.</p>
+            <h3>Monthly Activity</h3>
+            <p class="small">Problems solved by day.</p>
           </div>
           <div class="chart-nav">
             <button class="nav-btn" id="month-prev" aria-label="Previous month">&#60;</button>
@@ -46,50 +69,103 @@
         </div>
       </div>
       <div>
-        <h3>By difficulty</h3>
-        <p class="small">Solved by tier.</p>
+        <!-- Difficulty Distribution Chart -->
+        <h3>By Difficulty</h3>
+        <p class="small">Solved count by tier.</p>
         <div class="canvas-wrap">
           <canvas id="difficulty-chart" height="160"></canvas>
         </div>
       </div>
     </section>
 
+    <!-- Accordion Section: NeetCode List Progress -->
     <section class="card fade-in">
       <div class="accordion" id="accordion">
         <div class="timeline-header">
-          <h3>NeetCode 250 — Accordion</h3>
-          <span class="small">Tap a section to view problems</span>
+          <h3>NeetCode 250 Progress</h3>
+          <span class="small">Tap a category to view problems</span>
         </div>
+        <!-- Accordion Items injected by scripts/main.js renderAccordion() -->
       </div>
     </section>
 
+    <!-- Heatmap Section -->
     <section class="card fade-in">
       <div class="timeline-header">
-        <h3>2026 submission heatmap</h3>
+        <h3>2026 Submission Heatmap</h3>
       </div>
       <div class="heatmap-wrap">
         <div id="year-heatmap" class="heatmap-grid"></div>
       </div>
     </section>
 
+    <!-- Timeline Section: Recent Activity -->
     <section class="card fade-in">
       <div class="timeline-header">
-        <h3>Timeline</h3>
+        <h3>Recent Timeline</h3>
         <span class="small">Latest solved entries</span>
       </div>
-      <div class="timeline" id="timeline"></div>
+      <div class="timeline" id="timeline">
+        <!-- Timeline items injected by scripts/main.js renderTimeline() -->
+      </div>
+      <div class="timeline-actions">
+        <button class="link-btn" id="timeline-load-more" type="button">Load more</button>
+        <a class="small" id="timeline-view-all" href="#">View all</a>
+        <a class="small" id="timeline-back" href="#" style="display:none;">Back to timeline</a>
+      </div>
+      <!-- Archive View Container -->
+      <div class="timeline-archive" id="timeline-archive" hidden></div>
     </section>
 
+    <!-- Study Queue / External Links -->
     <section class="card fade-in study-card">
       <div class="timeline-header">
         <h3>Study Queue</h3>
-        <span class="small">Track next topics to learn</span>
+        <span class="small">Topics to learn next</span>
       </div>
-      <p class="small">Keep open items, in-progress notes, and takeaways in one place.</p>
+      <p class="small">Maintain your backlog in the markdown file.</p>
       <a class="link-btn" href="study-queue.md" target="_blank" rel="noreferrer">Open study-queue.md</a>
     </section>
   </div>
 
+  <!-- Shared Modal: Problem Details -->
+  <!-- Controlled by scripts/main.js showTimelineModal() -->
+  <dialog id="timeline-modal" class="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span data-field="title"></span>
+        <span class="badge" data-field="badge"></span>
+        <span class="pill" data-field="neet"></span>
+      </div>
+      <button class="link-btn" type="button" data-action="close-modal">Close</button>
+    </div>
+    <div class="modal-meta small" data-field="date"></div>
+    <div class="modal-body">
+      <!-- Section: My Approach -->
+      <div class="modal-col">
+        <h4>My Approach</h4>
+        <p data-field="my-approach"></p>
+        <p class="small" data-field="my-complexity"></p>
+      </div>
+      <!-- Section: Better Approach -->
+      <div class="modal-col">
+        <h4>Better Approach</h4>
+        <p data-field="better-approach"></p>
+        <p class="small" data-field="better-complexity"></p>
+      </div>
+      <!-- SRS Details (Hidden by default, used in Review Mode) -->
+      <div class="modal-col" id="modal-srs-info" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.1);">
+         <h4>Retention Stats</h4>
+         <p class="small">Next Review: <span data-field="srs-next"></span></p>
+         <p class="small">Interval: <span data-field="srs-interval"></span> days</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a data-field="link" href="#" target="_blank" rel="noreferrer">Open problem</a>
+    </div>
+  </dialog>
+
+  <!-- Main Logic Script -->
   <script type="module" src="scripts/main.js"></script>
 </body>
 </html>

@@ -1,18 +1,29 @@
 // Data loading and aggregation helpers
 export const ACTIVE_YEAR = 2026;
 
+/**
+ * Loads the static NeetCode 250 problem list.
+ * @returns {Promise<Object[]>}
+ */
 export async function loadProblems() {
   const res = await fetch('nc250.json');
   if (!res.ok) throw new Error('Failed to load nc250.json');
   return res.json();
 }
 
+/**
+ * Loads the user's solved problems.
+ * @returns {Promise<Object[]>}
+ */
 export async function loadSolved() {
   const res = await fetch('data/solved.json');
   if (!res.ok) throw new Error('Failed to load data/solved.json');
   return res.json();
 }
 
+/**
+ * Creates a quick lookup map for problems by name.
+ */
 export function buildProblemIndex(problems) {
   const byName = new Map();
   problems.forEach(sec => {
@@ -24,21 +35,40 @@ export function buildProblemIndex(problems) {
   return { byName };
 }
 
+/**
+ * Merges the raw solved entry with NeetCode metadata.
+ * Ensures the 'review' object exists for legacy data.
+ */
 export function annotateSolved(problems, solved) {
   const index = buildProblemIndex(problems);
+  
   return solved.map(entry => {
     const num = entry.number != null ? Number(entry.number) : null;
-    const info = entry.name ? index.byName.get(entry.name.toLowerCase()) : undefined;
+    const nameKey = entry.name ? entry.name.toLowerCase() : '';
+    const info = index.byName.get(nameKey);
+
+    // Default SRS if missing (Migration logic)
+    const review = entry.review || {
+      nextReviewDate: entry.date, // Due on creation date
+      interval: 0,
+      easeFactor: 2.5,
+      repetitions: 0
+    };
+
     return {
       ...entry,
       number: num,
       isNeet: Boolean(info),
       difficulty: entry.difficulty || info?.difficulty || 'Unknown',
-      name: entry.name || info?.name
+      name: entry.name || info?.name,
+      review: review
     };
   });
 }
 
+/**
+ * Creates a Set of solved problem names for O(1) checking.
+ */
 export function buildSolvedLookup(solved) {
   const byName = new Set();
   solved.forEach(entry => {
@@ -47,31 +77,50 @@ export function buildSolvedLookup(solved) {
   return { byName };
 }
 
+/**
+ * Main statistics aggregation.
+ * Computes totals, streaks, heatmaps, and SRS queue counts.
+ */
 export function computeStats(problems, solved) {
   const annotated = annotateSolved(problems, solved);
   const annotatedYear = annotated.filter(e => isInYear(e.date, ACTIVE_YEAR));
+
+  // 1. Completion Stats
   const totalProblems = problems.reduce((acc, sec) => acc + sec.questions.length, 0);
   const solvedCountAll = annotatedYear.length;
-
   const neetSolved = annotatedYear.filter(e => e.isNeet);
   const solvedCountNeet = neetSolved.length;
   const remainingNeet = Math.max(totalProblems - solvedCountNeet, 0);
 
+  // 2. Difficulty Breakdown
   const diffTotals = { Easy: 0, Medium: 0, Hard: 0 };
   problems.forEach(sec => {
     sec.questions.forEach(q => { diffTotals[q.difficulty] = (diffTotals[q.difficulty] || 0) + 1; });
   });
 
   const diffSolved = { Easy: 0, Medium: 0, Hard: 0 };
-  annotatedYear.forEach(entry => { diffSolved[entry.difficulty] = (diffSolved[entry.difficulty] || 0) + 1; });
+  annotatedYear.forEach(entry => { 
+    if (diffSolved[entry.difficulty] !== undefined) {
+      diffSolved[entry.difficulty]++;
+    }
+  });
 
+  // 3. Time Series Data
   const { dailyCounts, streak, activeDays } = computeDailyCounts(annotatedYear);
   const monthlyCounts = computeMonthlyCounts(annotatedYear, ACTIVE_YEAR);
   const yearHeatmap = computeYearHeatmap(annotatedYear, ACTIVE_YEAR);
   const projections = computeProjections({ solvedCountNeet, solvedCountAll }, ACTIVE_YEAR);
 
+  // 4. SRS Review Queue Count
+  // Count items where nextReviewDate <= Today
+  const todayStr = formatDateLocal(new Date());
+  const dueForReview = annotated.filter(e => {
+    return e.review && e.review.nextReviewDate <= todayStr;
+  }).length;
+
   return {
-    annotatedSolved: annotatedYear,
+    annotatedSolved: annotatedYear, // For Timeline
+    allSolved: annotated,           // For SRS (includes past years if any)
     totalProblems,
     solvedCountAll,
     solvedCountNeet,
@@ -84,6 +133,7 @@ export function computeStats(problems, solved) {
     monthlyCounts,
     yearHeatmap,
     projections,
+    dueForReview,
     year: ACTIVE_YEAR
   };
 }

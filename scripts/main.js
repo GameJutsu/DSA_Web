@@ -8,11 +8,23 @@ async function init() {
     const [problems, solved] = await Promise.all([loadProblems(), loadSolved()]);
     const stats = computeStats(problems, solved);
     const solvedLookup = buildSolvedLookup(stats.annotatedSolved.filter(e => e.isNeet));
+    const solvedByName = new Map();
+    stats.annotatedSolved.forEach(e => {
+      if (e.name) solvedByName.set(e.name.toLowerCase(), e);
+    });
 
     renderStats(stats);
-    renderAccordion(problems, solvedLookup);
+    renderAccordion(problems, solvedLookup, solvedByName);
     renderTimeline(stats.annotatedSolved);
     renderMini(stats.dailyCounts);
+    
+    // Update Review Pill logic
+    const reviewPill = document.getElementById('review-pill');
+    if (reviewPill && stats.dueForReview > 0) {
+      reviewPill.textContent = `Review: ${stats.dueForReview} due`;
+      reviewPill.style.display = 'inline-flex';
+    }
+
     const dailyTooltip = document.createElement('div');
     dailyTooltip.className = 'tooltip';
     document.querySelector('#daily-chart').parentElement.appendChild(dailyTooltip);
@@ -138,7 +150,7 @@ function renderMini(dailyCounts) {
   pill.textContent = `Today: ${today} | 7d: ${last7}`;
 }
 
-function renderAccordion(problems, solvedLookup) {
+function renderAccordion(problems, solvedLookup, solvedByName) {
   const container = document.getElementById('accordion');
   const html = problems.map(section => {
     const solvedCount = section.questions.filter(q => isSolved(q, solvedLookup)).length;
@@ -146,6 +158,19 @@ function renderAccordion(problems, solvedLookup) {
     const pct = total ? Math.round((solvedCount / total) * 100) : 0;
     const body = section.questions.map(q => {
       const solved = isSolved(q, solvedLookup);
+      const solvedEntry = q.name ? solvedByName?.get(q.name.toLowerCase()) : null;
+      const detailBtn = solvedEntry ? `
+        <button class="link-btn question-detail" type="button"
+          data-name="${(solvedEntry.name || '').replace(/"/g, '&quot;')}"
+          data-difficulty="${(solvedEntry.difficulty || '').replace(/"/g, '&quot;')}"
+          data-is-neet="${solvedEntry.isNeet ? 'true' : 'false'}"
+          data-my-approach="${(solvedEntry.myApproach || '').replace(/"/g, '&quot;')}"
+          data-my-complexity="${(solvedEntry.myComplexity || '').replace(/"/g, '&quot;')}"
+          data-better-approach="${(solvedEntry.betterApproach || '').replace(/"/g, '&quot;')}"
+          data-better-complexity="${(solvedEntry.betterComplexity || '').replace(/"/g, '&quot;')}"
+          data-link="${(solvedEntry.link || solvedEntry.url || '').replace(/"/g, '&quot;')}"
+          data-date="${(solvedEntry.date || '').replace(/"/g, '&quot;')}">Details</button>
+      ` : '';
       return `
         <div class="question-row ${solved ? 'solved' : ''}">
           <div class="flex" style="gap:8px;">
@@ -153,6 +178,7 @@ function renderAccordion(problems, solvedLookup) {
             <div>
               <a class="question-title ${difficultyClass(q.difficulty)}" href="${q.link}" target="_blank" rel="noreferrer">${q.name}</a>
             </div>
+            ${detailBtn}
           </div>
         </div>`;
     }).join('');
@@ -193,26 +219,194 @@ function renderAccordion(problems, solvedLookup) {
       item.classList.toggle('open');
     });
   });
+
+  container.querySelectorAll('.question-detail').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const entry = {
+        name: btn.dataset.name,
+        difficulty: btn.dataset.difficulty,
+        isNeet: btn.dataset.isNeet === 'true',
+        myApproach: btn.dataset.myApproach,
+        myComplexity: btn.dataset.myComplexity,
+        betterApproach: btn.dataset.betterApproach,
+        betterComplexity: btn.dataset.betterComplexity,
+        link: btn.dataset.link,
+        date: btn.dataset.date,
+      };
+      showTimelineModal(entry);
+    });
+  });
+}
+
+function showTimelineModal(entry) {
+  const dialogEl = document.getElementById('timeline-modal');
+  if (!dialogEl) return;
+
+  const safe = (val, fallback = '—') => {
+    if (val == null) return fallback;
+    const text = String(val).trim();
+    return text.length ? text : fallback;
+  };
+
+  const titleEl = dialogEl.querySelector('[data-field="title"]');
+  const badgeEl = dialogEl.querySelector('[data-field="badge"]');
+  const neetEl = dialogEl.querySelector('[data-field="neet"]');
+  const myApproachEl = dialogEl.querySelector('[data-field="my-approach"]');
+  const myComplexityEl = dialogEl.querySelector('[data-field="my-complexity"]');
+  const betterApproachEl = dialogEl.querySelector('[data-field="better-approach"]');
+  const betterComplexityEl = dialogEl.querySelector('[data-field="better-complexity"]');
+  const linkEl = dialogEl.querySelector('[data-field="link"]');
+  const dateEl = dialogEl.querySelector('[data-field="date"]');
+
+  if (titleEl) titleEl.textContent = safe(entry.name, 'Untitled');
+  if (badgeEl) {
+    badgeEl.textContent = safe(entry.difficulty, 'Unknown');
+    badgeEl.className = `badge ${difficultyClass(entry.difficulty)}`;
+  }
+  if (neetEl) neetEl.textContent = entry.isNeet ? 'NeetCode' : 'Not in NeetCode';
+  if (myApproachEl) myApproachEl.textContent = safe(entry.myApproach, 'No notes yet');
+  if (myComplexityEl) myComplexityEl.textContent = safe(entry.myComplexity, 'Complexity: n/a');
+  if (betterApproachEl) betterApproachEl.textContent = safe(entry.betterApproach, 'No alt notes yet');
+  if (betterComplexityEl) betterComplexityEl.textContent = safe(entry.betterComplexity, '');
+  if (linkEl) {
+    const href = safe(entry.link || entry.url, '#');
+    linkEl.href = href;
+    linkEl.textContent = href === '#' ? 'Link unavailable' : href;
+    linkEl.rel = 'noreferrer';
+    linkEl.target = '_blank';
+  }
+  if (dateEl) dateEl.textContent = safe(entry.date, '');
+
+  if (!dialogEl.dataset.wired) {
+    const closeBtn = dialogEl.querySelector('[data-action="close-modal"]');
+    if (closeBtn) closeBtn.addEventListener('click', () => dialogEl.close());
+    dialogEl.addEventListener('cancel', () => dialogEl.close());
+    dialogEl.addEventListener('click', (ev) => {
+      if (ev.target === dialogEl) {
+        dialogEl.close();
+      }
+    });
+    dialogEl.dataset.wired = 'true';
+  }
+
+  dialogEl.showModal();
 }
 
 function renderTimeline(solved) {
-  const wrap = document.getElementById('timeline');
+  const listEl = document.getElementById('timeline');
+  const loadMoreBtn = document.getElementById('timeline-load-more');
+  const viewAllLink = document.getElementById('timeline-view-all');
+  const backLink = document.getElementById('timeline-back');
+  const archiveEl = document.getElementById('timeline-archive');
+  if (!listEl || !loadMoreBtn || !viewAllLink || !archiveEl) return;
+
   const sorted = [...solved].sort((a, b) => b.date.localeCompare(a.date));
-  wrap.innerHTML = sorted.slice(0, 15).map((entry, i) => `
-    <div class="timeline-item">
-      <div class="flex" style="justify-content:space-between;">
-        <div class="flex" style="gap:8px;">
-          <span class="badge ${difficultyClass(entry.difficulty)}">${entry.difficulty}</span>
-          <strong>${entry.number ? `${entry.number}. ` : ''}${entry.name}</strong>
+  let visibleCount = 10;
+
+  const escapeAttr = (val) => String(val ?? '').replace(/"/g, '&quot;');
+
+  const buildItem = (entry) => {
+    const diffLabel = entry.difficulty || 'Unknown';
+    const nameLabel = entry.name || 'Untitled';
+    const numberPrefix = entry.number ? `${entry.number}. ` : '';
+    return `
+      <button class="timeline-item" type="button"
+        data-name="${escapeAttr(nameLabel)}"
+        data-difficulty="${escapeAttr(diffLabel)}"
+        data-is-neet="${entry.isNeet ? 'true' : 'false'}"
+        data-my-approach="${escapeAttr(entry.myApproach || '')}"
+        data-my-complexity="${escapeAttr(entry.myComplexity || '')}"
+        data-better-approach="${escapeAttr(entry.betterApproach || '')}"
+        data-better-complexity="${escapeAttr(entry.betterComplexity || '')}"
+        data-link="${escapeAttr(entry.link || entry.url || '')}"
+        data-date="${escapeAttr(entry.date || '')}">
+        <div class="flex" style="justify-content:space-between;">
+          <div class="flex" style="gap:8px; align-items:center;">
+            <span class="badge ${difficultyClass(entry.difficulty)}">${diffLabel}</span>
+            <strong>${numberPrefix}${nameLabel}</strong>
+          </div>
+          <span class="small">${entry.date || ''}</span>
         </div>
-        <span class="small">${entry.date || ''}</span>
-      </div>
-      <div class="small" style="margin-top:4px; color:#9cb4d0;">${entry.isNeet ? 'NeetCode' : 'Not in NeetCode'}</div>
-      <div class="small" style="margin-top:6px; color:#c3d7f5;">${entry.myComplexity || 'Complexity: pending'}</div>
-      <div class="small" style="margin-top:4px; color:#9cb4d0;">${entry.betterApproach || 'Better approach: pending'}</div>
-      <div class="small" style="margin-top:2px; color:#9cb4d0;">${entry.betterComplexity || ''}</div>
-    </div>
-  `).join('');
+        <div class="small" style="margin-top:4px; color:#9cb4d0;">${entry.isNeet ? 'NeetCode' : 'Not in NeetCode'}</div>
+        <div class="small" style="margin-top:6px; color:#c3d7f5;">${entry.myComplexity || '—'}</div>
+        <div class="small" style="margin-top:4px; color:#9cb4d0;">${entry.betterApproach || '—'}</div>
+        <div class="small" style="margin-top:2px; color:#9cb4d0;">${entry.betterComplexity || ''}</div>
+      </button>
+    `;
+  };
+
+  const renderList = () => {
+    const slice = sorted.slice(0, visibleCount);
+    listEl.innerHTML = slice.map(buildItem).join('');
+
+    listEl.querySelectorAll('.timeline-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const entry = {
+          name: btn.dataset.name,
+          difficulty: btn.dataset.difficulty,
+          isNeet: btn.dataset.isNeet === 'true',
+          myApproach: btn.dataset.myApproach,
+          myComplexity: btn.dataset.myComplexity,
+          betterApproach: btn.dataset.betterApproach,
+          betterComplexity: btn.dataset.betterComplexity,
+          link: btn.dataset.link,
+          date: btn.dataset.date
+        };
+        showTimelineModal(entry);
+      });
+    });
+
+    loadMoreBtn.style.display = visibleCount < sorted.length ? 'inline-flex' : 'none';
+  };
+
+  const renderArchive = () => {
+    const grouped = new Map();
+    sorted.forEach(entry => {
+      const key = entry.date ? entry.date.slice(0, 7) : 'Unknown';
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key).push(entry);
+    });
+
+    let html = '';
+    grouped.forEach((items, key) => {
+      const label = new Date(key + '-01').toLocaleString('en', { month: 'short', year: 'numeric' });
+      html += `<div class="archive-month"><div class="archive-title">${label}</div><div class="archive-list">`;
+      items.forEach(entry => {
+        const numberPrefix = entry.number ? `${entry.number}. ` : '';
+        html += `<div class="archive-item"><span class="badge ${difficultyClass(entry.difficulty)}">${entry.difficulty}</span><span>${numberPrefix}${entry.name}</span><span class="small">${entry.date || ''}</span></div>`;
+      });
+      html += '</div></div>';
+    });
+
+    archiveEl.innerHTML = html || '<div class="small">No entries</div>';
+  };
+
+  loadMoreBtn.addEventListener('click', () => {
+    visibleCount += 10;
+    renderList();
+  });
+
+  viewAllLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    renderArchive();
+    listEl.style.display = 'none';
+    loadMoreBtn.style.display = 'none';
+    viewAllLink.style.display = 'none';
+    backLink.style.display = 'inline-flex';
+    archiveEl.hidden = false;
+  });
+
+  backLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    archiveEl.hidden = true;
+    listEl.style.display = 'flex';
+    viewAllLink.style.display = 'inline-flex';
+    backLink.style.display = 'none';
+    renderList();
+  });
+
+  renderList();
 }
 
 function isSolved(question, lookup) {
