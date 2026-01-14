@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "date": "2026-01-01",
+    "number": 1929,
+    "name": "Concatenation of Array",
+    "difficulty": "Easy",
+    "link": "https://leetcode.com/problems/concatenation-of-array/",
+    "solvedInPython": false,
+    "code": "class Solution {\npublic:\n    vector<int> getConcatenation(vector<int>& nums) {\n        int len=nums.size();\n        vector<int> ans(len*2);\n        for(int i=0; i<len; i++){\n            ans[i]=nums[i];\n            ans[len+i]=nums[i];\n        }\n        return ans;\n    }\n};",
+    "myApproach": "Create a result vector of size `2*n`. Iterate through the input array once. For each element at index `i`, assign it to both `ans[i]` and `ans[i+n]` to create the concatenation in a single pass.",
+    "myComplexity": "Time O(n), Space O(n) (output array).",
+    "betterApproach": "This is optimal. You could use `ans.insert(ans.end(), nums.begin(), nums.end())` twice for cleaner code, but the complexity remains the same.",
+    "betterComplexity": "Time O(n), Space O(n).",
+    "review": {
+      "nextReviewDate": "2026-01-01",
+      "interval": 0,
+      "easeFactor": 2.5,
+      "repetitions": 0
+    }
+  },
+  {
+    "date": "2026-01-01",
+    "number": 66,
+    "name": "Plus One",
+    "difficulty": "Easy",
+    "link": "https://leetcode.com/problems/plus-one/",
+    "solvedInPython": false,
+    "code": "class Solution {\npublic:\n    vector<int> plusOne(vector<int>& digits) {\n        int len=digits.size();\n        for(int i=len-1; i>=0; i--){\n            if(digits[i]!=9){\n                digits[i]+=1;\n                return digits;\n            }\n            else\n            {\n                if(i==0){\n                    digits[i]=1;\n                    digits.push_back(0);\n                }\n                else digits[i]=0;\n            }\n        }\n        return digits;\n    }\n};",
+    "myApproach": "Iterate from the last digit backwards. If a digit is less than 9, increment it and return immediately. If it is 9, set it to 0 to propagate the carry. A special check inside the loop handles the most significant digit (index 0): if it was 9, set it to 1 and push back a 0 to handle the size increase (e.g., 9 -> 10).",
+    "myComplexity": "Time O(n), Space O(1) (in-place).",
+    "betterApproach": "The logic is correct, but the special case for `i==0` increases nesting. A cleaner pattern is to let the loop finish if all digits are 9s (which turns them all to 0s), and then handle the overflow after the loop by resizing or inserting `1` at the beginning.",
+    "betterComplexity": "Time O(n), Space O(1).",
+    "review": {
+      "nextReviewDate": "2026-01-01",
+      "interval": 0,
+      "easeFactor": 2.5,
+      "repetitions": 0
+    }
+  }
+]

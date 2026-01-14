@@ -35,13 +35,15 @@ We avoid editing `data/solved.json` directly to prevent syntax errors and ensure
   *   The app auto-generates approach and complexity drafts.
   *   Click "Generate Payload".
 
-2.  **Commit the Data**:
-    *   Copy the JSON payload from the browser.
-    *   Create a temporary file (e.g., `temp-entry.json`) with that content.
-    *   Run the commit script:
+2.  **Enhance & Commit**:
+    *   **Copy** the draft JSON payload from the browser.
+    *   **Paste** it into a temporary file (e.g., `temp.json`) or share it with the AI agent.
+    *   **Ask the AI** to "Enhance this entry". The AI will replace the "Auto-generated draft" text with a proper analysis.
+    *   **Save** the enhanced JSON to `temp.json`.
+    *   **Run the script**:
     ```powershell
     # Windows PowerShell
-    node scripts/commit-entry.js temp-entry.json
+    node scripts/commit-entry.js temp.json
     ```
     *   *The script will validate the data, check for duplicates, and append it to `data/solved.json`.*
 
